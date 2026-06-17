@@ -29,7 +29,7 @@ A trader calling an admin-only method receives a forbidden response — not brok
 
 Streaming: Instead of fire-and-forget broadcasts, the Hub uses IAsyncEnumerable<T> — a server-to-client stream that pushes data continuously until the client cancels it. 
 
-Load Balancing: Channel<T> a thread-safe, high-performance producer-consumer queue,
+Load Balancing: "Channel-T" a thread-safe, high-performance producer-consumer queue,
 Making the Hub and IAsyncEnumerabke  threads to communicate safely .
 
 The server produces at a rate it controls and the client consumes at its own pace.
