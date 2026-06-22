@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Meridian Capital — Login</title>
+    <link rel="stylesheet" href="/wwwroot/js/css/login.css">
+  </head>
+  
+  <body>
+      <div class="card">
+
+        <h1> Meridian Capital</h1>
+
+        <p class="sub">Market Data Terminal — Sign In</p>
+
+        <label>USERNAME</label>
+        <input type="text"     id="u" placeholder="admin / alice / bob / viewer">
+
+        <label>PASSWORD</label>
+        <input type="password" id="p" placeholder="admin123 / alice123 / viewer123">
+
+        <button class="btn" id="login">Sign In</button>
+
+        <div class="err" id="err">Invalid credentials.</div>
+          <div class="hint">
+            admin → admin.html | alice/bob → trader.html | viewer → viewer.html
+          </div>
+      </div>
+
+      <script src="/wwwroot/js/login.js"></script>
+  </body>
+</html>
