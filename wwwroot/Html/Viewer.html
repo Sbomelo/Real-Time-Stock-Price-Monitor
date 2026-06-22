@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Market Viewer — Meridian Capital</title>
+        <link rel="stylesheet" href="/wwwroot/css/Viewer.css">
+    </head>
+
+    <body>
+        <header>
+            <div class="brand">MARKET VIEWER (15s Delay)</div>
+
+            <div class="hinfo">
+                <span class="conn-dot" id="dot"></span>
+                <span id="cst">Connecting...</span>
+            </div>
+        </header>
+
+        <main>
+            <div class="delay-banner">
+                 Prices shown are delayed by 15 seconds. For live data, contact your administrator.
+            </div>
+
+            <div class="controls">
+                <select id="sym">
+                    <option>AAPL</option>
+                    <option>MSFT</option>
+                    <option>GOOG</option>
+                    <option>NVDA</option>
+                    <option>TSLA</option>
+                </select>
+
+                <button class="btn-v" id="startBtn">Subscribe (15s delay)</button>
+            </div>
+
+            <div class="price-display" id="display">
+                <div class="pd-waiting">
+                    Select a symbol and subscribe to see delayed pricing.
+                </div>
+            </div>
+        </main>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+        <script src="/wwwroot/js/Viewer.js"></script>
+    </body>
+</html>
