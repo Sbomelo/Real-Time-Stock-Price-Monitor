@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Admin Console — Meridian Capital</title>
+        <link rel="stylesheet" href="css/admin.css">
+    </head>
+
+    <body>
+        <header>
+            <div class="brand">ADMIN CONSOLE</div>
+            <div class="hinfo">
+                <span class="conn-dot" id="dot"></span>
+                <span id="uname"></span> | <span id="connst">Connecting...</span>
+            </div>
+        </header>
+
+        <main>
+            <div class="alert-banner" id="alert"></div>
+
+            <!-- Broadcast Control Panel -->
+            <section class="panel">
+                <div class="panel-title">BROADCAST CONTROL</div>
+
+                <div class="controls">
+                    <select id="cmd">
+                        <option value="PAUSE">PAUSE</option>
+                        <option value="RESUME">RESUME</option>
+                        <option value="HALT">HALT</option>
+                        <option value="NOTICE">NOTICE</option>
+                    </select>
+
+                    <input id="msg" type="text" placeholder="Message to broadcast..." />
+
+                    <button class="btn-send" id="sendBtn">Broadcast</button>
+                </div>
+            </section>
+
+            <!-- Live Price Monitor (admin sees full trader feed) -->
+            <section class="panel">
+                <div class="panel-title">LIVE PRICE MONITOR</div>
+
+                <div class="controls">
+                    <select id="sym">
+                        <option>AAPL</option>
+                        <option>MSFT</option>
+                        <option>GOOG</option>
+                        <option>NVDA</option>
+                        <option>TSLA</option>
+                    </select>
+
+                    <button class="btn-stream" id="startBtn">Start Feed</button>
+                    <button class="btn-stop"   id="stopBtn">Stop</button>
+                </div>
+
+                <div class="ticker-grid" id="grid"></div>
+            </section>
+
+            <!-- Broadcast Event Log -->
+            <section class="panel">
+                <div class="panel-title">BROADCAST LOG</div>
+                <div class="feed-log" id="log">
+                    <div class="log-entry log-empty">No broadcasts sent yet.</div>
+                </div>
+            </section>
+        </main>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+        <script src="js/admin.js"></script>
+    </body>
+</html>
