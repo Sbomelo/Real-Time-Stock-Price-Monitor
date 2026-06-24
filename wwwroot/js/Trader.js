@@ -42,7 +42,7 @@ connection.onreconnected(async () => {
 
 async function startStream() {
     const sym = document.getElementById("sym").value;
-    subscription = connection.stream("StreamPrices", sym)     
+    subscription = connection.stream("StreamPrice", sym)     
         .subscribe({
             next: (tick) => {
                 updateCard(tick);

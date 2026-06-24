@@ -17,7 +17,7 @@ document.getElementById("startBtn").addEventListener("click", () => {
     const sym = document.getElementById("sym").value;
     // Viewers call StreamDelayedPrices — NOT StreamPrices
     // If they tried to call StreamPrices, the server would return 403 Forbidden
-    sub = connection.stream("StreamDelayedPrices", sym)           
+    sub = connection.stream("StreamDelayedPrice", sym)           
         .subscribe({
             next: (tick) => {
                 document.getElementById("display").innerHTML = `
