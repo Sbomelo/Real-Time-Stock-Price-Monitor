@@ -11,8 +11,8 @@ namespace Real_Time_Stock_Price_Monitor.Services;
         _users = new()
         {
             ["admin"]  = ("admin123",  "Admin",  "Sibonelo"),
-            ["alice"]  = ("alice123",  "Trader", "Mduduzi"),
-            ["bob"]    = ("bob123",    "Trader", "Elethu"),
+            ["alice"]  = ("alice123",  "Trader", "Alice"),
+            ["bob"]    = ("bob123",    "Trader", "Bob"),
             ["viewer"] = ("viewer123", "Viewer", "Lumiyo")
         };
 
@@ -56,8 +56,8 @@ namespace Real_Time_Stock_Price_Monitor.Services;
 
             //Setting up the JWT
             var token = new JwtSecurityToken(
-                issuer : "merdian-capital",
-                audience : "meridaian-capital",
+                issuer : "meridian-capital",
+                audience : "meridian-capital",
                 claims : claims,
                 expires: DateTime.UtcNow.AddHours(8),
                 signingCredentials : creds

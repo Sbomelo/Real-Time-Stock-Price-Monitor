@@ -28,7 +28,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                ValidateAudience = true,
                ValidAudience = "meridian-capital",
                ValidateLifetime = true,
-               ClockSkew = TimeSpan.FromSeconds(30)
+               ClockSkew = TimeSpan.FromMinutes(15)
            };
 
 
