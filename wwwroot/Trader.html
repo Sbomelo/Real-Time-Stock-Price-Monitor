@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Trader Dashboard — Meridian Capital</title>
+        <link rel="stylesheet" href="css/Trader.css" >
+    </head>
+
+    <body>
+        <header>
+            <div class="brand">TRADER TERMINAL</div>
+
+            <div class="hinfo">
+                <span class="conn-dot" id="dot"></span>
+                <span id="uname"></span> | <span id="connst">Connecting...</span>
+            </div>
+        </header>
+
+        <main>
+            <div class="alert-banner" id="alert">
+
+            </div>
+
+            <div class="controls">
+                <select id="sym">
+                    <option>AAPL</option>
+                    <option>MSFT</option>
+                    <option>GOOG</option>
+                    <option>NVDA</option>
+                    <option>TSLA</option>
+                </select>
+
+                <button class="btn-stream" id="startBtn">Start Live Feed</button>
+
+                <button class="btn-stop"   id="stopBtn">Stop</button>
+            </div>
+
+            <div class="ticker-grid" id="grid">
+
+            </div>
+
+            <div class="feed-log" id="log">
+
+            </div>
+        </main>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+        <script src="js/Trader.js"></script>
+    </body>
+</html>
