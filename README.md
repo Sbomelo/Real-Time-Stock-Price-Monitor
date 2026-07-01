@@ -106,3 +106,4 @@ To verify admin-only access: on a trader tab console, type connection.invoke("Co
 ![](https://github.com/Sbomelo/Real-Time-Stock-Price-Monitor/blob/c2d0fa6d58509e7d060ce94584bf96fc5208b940/Screenshot%20(71).png)
 ![](https://github.com/Sbomelo/Real-Time-Stock-Price-Monitor/blob/46a3abde6a7f72d7617164d72939803e4f6e1b6f/Screenshot%20(72).png)
 ![](https://github.com/Sbomelo/Real-Time-Stock-Price-Monitor/blob/e0e12fea1f5fd519df0ae632a28aea54249cac65/Screenshot%20(73).png)
+![](https://github.com/Sbomelo/Real-Time-Stock-Price-Monitor/blob/e9d2a2107c9517380439f739f107895275469595/Screenshot%202026-07-01%20160100.png)
