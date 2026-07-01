@@ -42,3 +42,4 @@ The server produces at a rate it controls and the client consumes at its own pac
 ![](https://github.com/Sbomelo/Real-Time-Stock-Price-Monitor/blob/ceebee4d7e82c1f75a495e3abf8a9d39c68352b2/Screenshot%202026-06-25%20111745.png)
 ![](https://github.com/Sbomelo/Real-Time-Stock-Price-Monitor/blob/752cbb71bd714729eb0b11550e5a379c94d43db6/Screenshot%20(70).png)
 ![](https://github.com/Sbomelo/Real-Time-Stock-Price-Monitor/blob/c2d0fa6d58509e7d060ce94584bf96fc5208b940/Screenshot%20(71).png)
+![](https://github.com/Sbomelo/Real-Time-Stock-Price-Monitor/blob/46a3abde6a7f72d7617164d72939803e4f6e1b6f/Screenshot%20(72).png)
