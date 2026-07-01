@@ -35,3 +35,5 @@ Making the Hub and IAsyncEnumerabke  threads to communicate safely .
 The server produces at a rate it controls and the client consumes at its own pace.
 
 ![](https://github.com/Sbomelo/Real-Time-Stock-Price-Monitor/blob/1fab0c5847084e712d226ac2d6cb93100c07ef84/Screenshot%202026-06-25%20111520.png)
+![](https://github.com/Sbomelo/Real-Time-Stock-Price-Monitor/blob/405e8d9dd4fdcd05887d8c68c7b584a05ba5b0e5/Screenshot%20(69).png)
+
