@@ -1,10 +1,6 @@
-// Guard: redirect to login if no JWT or not Admin
-const jwt  = sessionStorage.getItem("jwt");
-const role = sessionStorage.getItem("role");
-if (!jwt || role !== "Admin") { location.href = "/"; }
-
-document.getElementById("uname").textContent =
-    sessionStorage.getItem("name") || "Admin";
+Auth.requireLogin("Admin");
+document.getElementById("uname").textContent = Auth.get("name") || "Admin";
+document.getElementById("logout").addEventListener("click", Auth.logout);
 
 let subscription = null;
 const cards = new Map();
@@ -12,7 +8,7 @@ const cards = new Map();
 // Build authenticated connection
 const connection = new signalR.HubConnectionBuilder()
     .withUrl("/stockHub", {
-        accessTokenFactory: () => sessionStorage.getItem("jwt")
+        accessTokenFactory: () => Auth.get("jwt")
     })
     .withAutomaticReconnect()
     .configureLogging(signalR.LogLevel.Warning)
@@ -133,6 +129,7 @@ async function start() {
     try {
         await connection.start();
     } catch (e) {
+        if (Auth.isAuthError(e)) { Auth.logout(); return; }
         document.getElementById("connst").textContent = "Auth failed — " + e.message;
         setTimeout(start, 5000);
     }

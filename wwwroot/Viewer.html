@@ -8,17 +8,17 @@
 
     <body>
         <header>
-            <div class="brand">MARKET VIEWER (15s Delay)</div>
-
+            <div class="brand">ADMIN CONSOLE</div>
             <div class="hinfo">
                 <span class="conn-dot" id="dot"></span>
-                <span id="cst">Connecting...</span>
+                <span id="uname"></span> | <span id="connst">Connecting...</span>
+                <button class="logout" id="logout">Log out</button>
             </div>
         </header>
 
         <main>
             <div class="delay-banner">
-                 Prices shown are delayed by 15 seconds. For live data, contact your administrator.
+                Prices shown are delayed by 15 seconds. For live data, contact your administrator.
             </div>
 
             <div class="controls">
@@ -41,6 +41,7 @@
         </main>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+        <script src="js/auth.js"></script>
         <script src="js/Viewer.js"></script>
     </body>
 </html>

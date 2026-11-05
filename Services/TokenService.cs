@@ -1,70 +1,60 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Real_Time_Stock_Price_Monitor.Data;
 using Real_Time_Stock_Price_Monitor.Models;
 
 namespace Real_Time_Stock_Price_Monitor.Services;
-    public class TokenService
+
+public class TokenService
+{
+    private readonly AppDbContext _db;
+    private readonly IConfiguration _config;
+    private readonly PasswordHasher<AppUser> _hasher = new();
+
+    public TokenService(AppDbContext db, IConfiguration config)
     {
-        private static readonly Dictionary<string,(string Password, string Role, string Name)> 
-        _users = new()
+        _db = db;
+        _config = config;
+    }
+
+    public async Task<LoginResponse?> AuthenticateAsync(LoginRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrEmpty(request.Password))
+            return null;
+
+        var username = request.Username.Trim().ToLowerInvariant();
+        var user = await _db.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Username == username);
+        if (user is null) return null;
+
+        var result = _hasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
+        if (result == PasswordVerificationResult.Failed) return null;
+
+        var token = GenerateJwt(user.Username, user.DisplayName, user.Role);
+        return new LoginResponse(token, user.Role, user.DisplayName);
+    }
+
+    public string GenerateJwt(string username, string name, string role)
+    {
+        var key = JwtSettings.GetSigningKey(_config);
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var claims = new[]
         {
-            ["admin"]  = ("admin123",  "Admin",  "Sibonelo"),
-            ["alice"]  = ("alice123",  "Trader", "Alice"),
-            ["bob"]    = ("bob123",    "Trader", "Bob"),
-            ["viewer"] = ("viewer123", "Viewer", "Lumiyo")
+            new Claim(ClaimTypes.NameIdentifier, username),
+            new Claim(ClaimTypes.Name, name),
+            new Claim(ClaimTypes.Role, role)
         };
 
-        private const string _secret = "meridian-capital-jwt-signing-secret-key-must-be-32-chars";
+        var token = new JwtSecurityToken(
+            issuer: JwtSettings.Issuer,
+            audience: JwtSettings.Audience,
+            claims: claims,
+            expires: DateTime.UtcNow.AddHours(8),
+            signingCredentials: creds);
 
-        public LoginResponse? Authenticate(LoginRequest request)
-        {
-            if(!_users.TryGetValue(request.Username.ToLowerInvariant(), out var user))
-                return null;
-
-
-            if(user.Password != request.Password)
-                return null;
-
-
-            var token = GenerateJwt(request.Username, user.Name, user.Role);
-            return new LoginResponse(token, user.Role, user.Name);
-
-        }
-
-        public string GenerateJwt(string username, string name, string role)
-        {
-            //Building the singning key from the _secret
-            var key = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(_secret));
-
-
-            //Signing the key 
-            var creds = new SigningCredentials(key,
-                            SecurityAlgorithms.HmacSha256);
-
-
-            //Defining Claims
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, username),
-                new Claim(ClaimTypes.Name, name),
-                new Claim(ClaimTypes.Role, role)
-            };
-
-
-            //Setting up the JWT
-            var token = new JwtSecurityToken(
-                issuer : "meridian-capital",
-                audience : "meridian-capital",
-                claims : claims,
-                expires: DateTime.UtcNow.AddHours(8),
-                signingCredentials : creds
-            );
-
-            //Serialize the JwtSecurityToken object into the standard JWT string format
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
+}

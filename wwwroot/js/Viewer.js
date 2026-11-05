@@ -1,10 +1,10 @@
-const jwt = sessionStorage.getItem("jwt");
-if (!jwt) location.href = "/";
+Auth.requireLogin();
+document.getElementById("logout").addEventListener("click", Auth.logout);
 
 let sub = null;
 
 const connection = new signalR.HubConnectionBuilder()
-    .withUrl("/stockHub", { accessTokenFactory: () => sessionStorage.getItem("jwt") })
+    .withUrl("/stockHub", { accessTokenFactory: () => Auth.get("jwt") })
     .withAutomaticReconnect().configureLogging(signalR.LogLevel.Warning).build();
 
 connection.on("Connected", (id, name, role) => {
@@ -41,6 +41,9 @@ document.getElementById("startBtn").addEventListener("click", () => {
 
 async function start() {
     try { await connection.start(); }
-    catch(e) { document.getElementById("cst").textContent="Auth failed"; }
+    catch (e) {
+        if (Auth.isAuthError(e)) { Auth.logout(); return; }
+        document.getElementById("cst").textContent = "Auth failed";
+    }
 }
 start();

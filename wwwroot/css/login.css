@@ -26,3 +26,18 @@
     .hint { font-size:12px; color:#2d3a5a; margin-top:14px; font-family:monospace; }
     
     .err { color:#f87171; font-size:13px; margin-top:10px; display:none; }
+
+.remember {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    font-family: system-ui,sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+    .remember input {
+        width: auto;
+        margin: 0;
+    }

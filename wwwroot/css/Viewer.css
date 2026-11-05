@@ -138,3 +138,19 @@
         color:#2d3a5a; 
         padding-top:28px; 
     }
+
+.logout {
+    margin-left: 12px;
+    padding: 3px 10px;
+    background: transparent;
+    color: #6b7fa8;
+    border: 1px solid #1a2038;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+    .logout:hover {
+        color: #c8d4f0;
+        border-color: #6b7fa8;
+    }

@@ -1,18 +1,16 @@
-//Guard: redirect to login if no JWT
-const jwt = sessionStorage.getItem("jwt");
-if (!jwt) { location.href = "/"; }                         
-document.getElementById("uname").textContent =
-    sessionStorage.getItem("name") || "Trader";
+Auth.requireLogin();
+document.getElementById("uname").textContent = Auth.get("name") || "Trader";
+document.getElementById("logout").addEventListener("click", Auth.logout);
 
 
 let subscription = null;
 let tickCount = 0;
-const cards = new Map();   // symbol → DOM card element
+const cards = new Map();   // symbol => DOM card element
 
 //Build authenticated connection
 const connection = new signalR.HubConnectionBuilder()
     .withUrl("/stockHub", {
-        accessTokenFactory: () => sessionStorage.getItem("jwt")
+        accessTokenFactory: () => Auth.get("jwt")
     })
     .withAutomaticReconnect()
     .configureLogging(signalR.LogLevel.Warning)
@@ -106,6 +104,7 @@ async function start() {
         await connection.start(); 
     }
     catch (e) {
+        if (Auth.isAuthError(e)) { Auth.logout(); return; }
         document.getElementById("connst").textContent = "Auth failed — "  + e.message;
         setTimeout(start, 5000);
     }

@@ -1,21 +1,30 @@
-using System.ComponentModel;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Real_Time_Stock_Price_Monitor.Hubs;
-using Real_Time_Stock_Price_Monitor.Services;
-using Real_Time_Stock_Price_Monitor.Models;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Real_Time_Stock_Price_Monitor.Data;
+using Real_Time_Stock_Price_Monitor.Hubs;
+using Real_Time_Stock_Price_Monitor.Models;
+using Real_Time_Stock_Price_Monitor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//SERVICE REGISTRATION
+// JWT key from configuration
+var key = JwtSettings.GetSigningKey(builder.Configuration);
 
-//Jwt signing secret
-var jwtSecret = "meridian-capital-jwt-signing-secret-key-must-be-32-chars";
-var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret));
+// SQLite user store. IsNullOrWhiteSpace so an empty "" also falls back to the default.
+var connectionString = builder.Configuration.GetConnectionString("Default");
+if (string.IsNullOrWhiteSpace(connectionString))
+    connectionString = "Data Source=stockmonitor.db";
 
-//JWT Authentication
+var dbFolder = Path.GetDirectoryName(
+    Path.GetFullPath(new SqliteConnectionStringBuilder(connectionString).DataSource));
+if (!string.IsNullOrEmpty(dbFolder))
+    Directory.CreateDirectory(dbFolder);
+
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
        .AddJwtBearer(options =>
        {
@@ -24,13 +33,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                ValidateIssuerSigningKey = true,
                IssuerSigningKey = key,
                ValidateIssuer = true,
-               ValidIssuer = "meridian-capital",
+               ValidIssuer = JwtSettings.Issuer,
                ValidateAudience = true,
-               ValidAudience = "meridian-capital",
+               ValidAudience = JwtSettings.Audience,
                ValidateLifetime = true,
                ClockSkew = TimeSpan.FromMinutes(15)
            };
-
 
            options.Events = new JwtBearerEvents
            {
@@ -39,7 +47,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                    var accessToken = context.Request.Query["access_token"];
                    var path = context.HttpContext.Request.Path;
 
-                   if(!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/stockHub"))
+                   if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/stockHub"))
                    {
                        context.Token = accessToken;
                    }
@@ -51,38 +59,42 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-//Register Services
-builder.Services.AddSingleton<TokenService>();
+builder.Services.AddScoped<TokenService>();   
 builder.Services.AddHostedService<StockPriceFeedService>();
 builder.Services.AddSingleton<SubscriberStore>();
 
-
-//Register SignalR with JSON string enum serialization
-builder.Services.AddSignalR()
+var signalR = builder.Services.AddSignalR()
        .AddJsonProtocol(options =>
        {
            options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter());
        });
 
+// Redis backplane only when configured, so the app still runs without Redis.
+var redisConnection = builder.Configuration["Redis:ConnectionString"];
+if (!string.IsNullOrWhiteSpace(redisConnection))
+{
+    signalR.AddStackExchangeRedis(redisConnection);
+}
+
 var app = builder.Build();
 
-app.UseDefaultFiles();                               
-app.UseStaticFiles();                                      
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.EnsureCreated();
+    DbSeeder.SeedDemoUsers(db, app.Configuration);
+}
 
-app.UseAuthentication();                                  
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
-//Login endpoint
-app.MapPost("/auth/login",(LoginRequest req, TokenService ts) =>
+app.MapPost("/auth/login", async (LoginRequest req, TokenService ts) =>
 {
-    var result = ts.Authenticate(req);
-    if(result == null)
-    {
-        return Results.Unauthorized();
-    }else
-    {
-        return Results.Ok(result);
-    }
+    var result = await ts.AuthenticateAsync(req);
+    return result is null ? Results.Unauthorized() : Results.Ok(result);
 });
 
 app.MapHub<StockHub>("/stockHub");

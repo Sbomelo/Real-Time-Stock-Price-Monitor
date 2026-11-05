@@ -23,7 +23,9 @@ public class StockHub : Hub
     public async IAsyncEnumerable<StockPriceTick> StreamPrice(string symbol, 
                                         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        symbol = symbol.Trim().ToUpperInvariant();
+        symbol = (symbol ?? "").Trim().ToUpperInvariant();
+        if (!StockPriceFeedService.BasePrices.ContainsKey(symbol))
+            throw new HubException($"Unknown symbol '{symbol}'.");
         string connId = Context.ConnectionId;
         string userName = Context.User?.Identity?.Name?? "Unknown";
 
@@ -53,7 +55,9 @@ public class StockHub : Hub
     public async IAsyncEnumerable<DelayedPriceTick> StreamDelayedPrice(string symbol,
                                      [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-        symbol = symbol.Trim().ToUpperInvariant();
+        symbol = (symbol ?? "").Trim().ToUpperInvariant();
+        if (!StockPriceFeedService.BasePrices.ContainsKey(symbol))
+            throw new HubException($"Unknown symbol '{symbol}'.");
         string connId = Context.ConnectionId;
 
         var channel = _store.Subscribe(symbol, connId + "-delayed");
@@ -81,6 +85,7 @@ public class StockHub : Hub
         }
     }
 
+    [Authorize(Roles = "Admin")]
     public async Task ControlFeed(string command, string message)
     {
         string adminName = Context.User?.Identity?.Name ?? "Admin";
@@ -106,7 +111,7 @@ public class StockHub : Hub
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        _store.UnsubscribeAll(Context.ConnectionId);            // Line 22
+        _store.UnsubscribeAll(Context.ConnectionId);        
         await base.OnDisconnectedAsync(exception);
     }
 }

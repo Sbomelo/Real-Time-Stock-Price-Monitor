@@ -198,3 +198,19 @@ input {
     border: 1px solid rgba(74,222,128,.25);
     color: #4ade80;
 }
+
+.logout {
+    margin-left: 12px;
+    padding: 3px 10px;
+    background: transparent;
+    color: #6b7fa8;
+    border: 1px solid #1a2038;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+    .logout:hover {
+        color: #c8d4f0;
+        border-color: #6b7fa8;
+    }

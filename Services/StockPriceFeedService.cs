@@ -2,14 +2,14 @@ using Real_Time_Stock_Price_Monitor.Models;
 
 namespace Real_Time_Stock_Price_Monitor.Services;
 
-public class StockPriceFeedService : BackgroundService     
+public class StockPriceFeedService : BackgroundService
 {
     private readonly SubscriberStore _store;
     private readonly ILogger<StockPriceFeedService> _logger;
     private readonly Random _rng = new();
 
     // Simulated starting prices for demo symbols
-    private readonly Dictionary<string, decimal> _basePrices = new()
+    public static readonly IReadOnlyDictionary<string, decimal> BasePrices = new Dictionary<string, decimal>
     {
         ["AAPL"] = 189.50m,
         ["MSFT"] = 415.20m,
@@ -18,15 +18,15 @@ public class StockPriceFeedService : BackgroundService
         ["TSLA"] = 215.60m
     };
 
-    private Dictionary<string, decimal> _currentPrices;       
+    private Dictionary<string, decimal> _currentPrices;
 
     public StockPriceFeedService(
         SubscriberStore store,
         ILogger<StockPriceFeedService> logger)
     {
-        _store  = store;
+        _store = store;
         _logger = logger;
-        _currentPrices = new Dictionary<string, decimal>(_basePrices);
+        _currentPrices = new Dictionary<string, decimal>(BasePrices);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -37,49 +37,52 @@ public class StockPriceFeedService : BackgroundService
         {
             try
             {
-                GenerateAndBroadcastTicks();                  
+                GenerateAndBroadcastTicks();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error generating price ticks");
             }
 
-            await Task.Delay(500, stoppingToken);           
+            await Task.Delay(500, stoppingToken);
         }
     }
 
-    private void GenerateAndBroadcastTicks()                
+    private void GenerateAndBroadcastTicks()
     {
         // Only generate ticks for symbols that have subscribers
-        foreach (var symbol in _store.GetWatchedSymbols())    
+        foreach (var symbol in _store.GetWatchedSymbols())
         {
-            var newPrice = SimulateNewPrice(symbol);         
+            if (!BasePrices.TryGetValue(symbol, out var basePrice))
+                continue;
+
+            var newPrice = SimulateNewPrice(symbol);
             var oldPrice = _currentPrices.GetValueOrDefault(symbol, newPrice);
             _currentPrices[symbol] = newPrice;
 
-            var tick = new StockPriceTick                 
+            var tick = new StockPriceTick
             {
-                Symbol    = symbol,
-                Price     = newPrice,
-                Bid       = newPrice - 0.01m,
-                Ask       = newPrice + 0.01m,
-                Volume    = Random.Shared.NextInt64(1000, 50000),
-                Change    = Math.Round(newPrice - _basePrices[symbol], 2),
-                ChangePct = Math.Round((newPrice - _basePrices[symbol])
-                              / _basePrices[symbol] * 100m, 4),
+                Symbol = symbol,
+                Price = newPrice,
+                Bid = newPrice - 0.01m,
+                Ask = newPrice + 0.01m,
+                Volume = Random.Shared.NextInt64(1000, 50000),
+                Change = Math.Round(newPrice - basePrice, 2),
+                ChangePct = Math.Round((newPrice - basePrice)
+                              / basePrice * 100m, 4),
                 Timestamp = DateTime.UtcNow
             };
 
-            _store.BroadcastTick(tick);                
+            _store.BroadcastTick(tick);
         }
     }
 
-    private decimal SimulateNewPrice(string symbol)        
+    private decimal SimulateNewPrice(string symbol)
     {
-        var current    = _currentPrices.GetValueOrDefault(symbol, 100m);
-        
-        var changePct  = (decimal)(_rng.NextDouble() * 0.005 - 0.0025);  
-        var newPrice   = Math.Max(1m, current * (1 + changePct));
+        var current = _currentPrices.GetValueOrDefault(symbol, 100m);
+
+        var changePct = (decimal)(_rng.NextDouble() * 0.005 - 0.0025);
+        var newPrice = Math.Max(1m, current * (1 + changePct));
         return Math.Round(newPrice, 2);
     }
 }
